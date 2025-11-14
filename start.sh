@@ -37,9 +37,29 @@ if [ ! -f "$VM_DISK" ]; then
         echo "Note: Using Fedora 40 as it's the latest stable version"
         
         # Try downloading Fedora 40 Cloud image (smaller and faster)
+        DOWNLOAD_SUCCESS=false
         if curl -L --max-time 600 -o "$FEDORA_IMAGE" "https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-40-1.14.x86_64.qcow2" 2>&1; then
-            echo "✓ Fedora 40 Cloud Base image downloaded"
-            
+            # Verify the download was successful by checking file size and format
+            if [ -f "$FEDORA_IMAGE" ]; then
+                FILE_SIZE=$(stat -c%s "$FEDORA_IMAGE" 2>/dev/null || stat -f%z "$FEDORA_IMAGE" 2>/dev/null)
+                # Cloud images should be at least 100MB (104857600 bytes)
+                if [ "$FILE_SIZE" -gt 104857600 ]; then
+                    # Check if it's actually a qcow2 file
+                    if qemu-img info "$FEDORA_IMAGE" 2>/dev/null | grep -q "file format: qcow2"; then
+                        echo "✓ Fedora 40 Cloud Base image downloaded and verified"
+                        DOWNLOAD_SUCCESS=true
+                    else
+                        echo "Warning: Downloaded file is not in qcow2 format"
+                        rm -f "$FEDORA_IMAGE"
+                    fi
+                else
+                    echo "Warning: Downloaded file is too small ($FILE_SIZE bytes), likely a redirect or error page"
+                    rm -f "$FEDORA_IMAGE"
+                fi
+            fi
+        fi
+        
+        if [ "$DOWNLOAD_SUCCESS" = true ]; then
             # Create VM disk from cloud image
             echo "Creating VM disk from cloud image..."
             cp "$FEDORA_IMAGE" "$VM_DISK"
@@ -105,6 +125,19 @@ EOFUSER
             fi
         else
             echo "Error: Could not download Fedora image"
+            echo "Creating empty disk image..."
+            qemu-img create -f qcow2 "$VM_DISK" "$VM_DISK_SIZE"
+            echo "Note: VM will boot without OS. You'll need to attach an ISO manually."
+        fi
+    else
+        # FEDORA_IMAGE exists, but VM_DISK doesn't - create it from the base image
+        echo "Creating VM disk from existing base image..."
+        if qemu-img info "$FEDORA_IMAGE" 2>/dev/null | grep -q "file format: qcow2"; then
+            cp "$FEDORA_IMAGE" "$VM_DISK"
+            qemu-img resize "$VM_DISK" "$VM_DISK_SIZE"
+            echo "✓ VM disk created: $VM_DISK ($VM_DISK_SIZE)"
+        else
+            echo "Error: Existing base image is not in qcow2 format"
             echo "Creating empty disk image..."
             qemu-img create -f qcow2 "$VM_DISK" "$VM_DISK_SIZE"
             echo "Note: VM will boot without OS. You'll need to attach an ISO manually."

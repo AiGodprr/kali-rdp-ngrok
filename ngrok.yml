@@ -6,4 +6,4 @@ agent:
 tunnels:
   vnc:
     proto: tcp
-    addr: 5901
+    addr: 127.0.0.1:5901

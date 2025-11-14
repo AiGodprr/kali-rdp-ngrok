@@ -1,0 +1,6 @@
+authtoken: 353C8pdujnMKrBE4r9H0i2FVm7r_7xq9b8bsGqDLMzmd1VXny
+
+tunnels:
+  rdp:
+    addr: 3389
+    proto: tcp

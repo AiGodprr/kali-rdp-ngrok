@@ -6,9 +6,10 @@ This document describes how to verify that the Kali Linux XFCE desktop is runnin
 
 ### 1. Docker Image Configuration
 - **Base Image**: `kalilinux/kali-rolling` - Official Kali Linux rolling release
-- **Desktop Environment**: `xfce4` and `xfce4-goodies` - Full XFCE desktop
+- **Desktop Environment**: `kali-desktop-xfce` - Full Kali XFCE desktop with theming
+- **Kali Toolset**: `kali-linux-default` - Complete default toolset
 - **VNC Server**: `tigervnc-standalone-server` - TigerVNC for remote access
-- **Display Server**: `xserver-xorg-core` - X11 display server
+- **RDP Server**: `xrdp` - RDP server for remote desktop protocol access
 - **System Packages**: `dbus-x11`, `sudo`, `curl`, `unzip`
 
 ### 2. VNC Configuration
@@ -252,10 +253,13 @@ docker exec kali-vnc-test which startxfce4
 
 The implementation includes:
 - ✅ **Full Kali Linux**: Using official `kalilinux/kali-rolling` base image
-- ✅ **Complete XFCE Desktop**: Both `xfce4` and `xfce4-goodies` packages
+- ✅ **Complete XFCE Desktop**: Via `kali-desktop-xfce` metapackage with Kali theming
+- ✅ **Default Kali Toolset**: Via `kali-linux-default` metapackage with all standard tools
 - ✅ **All XFCE Components**: Session manager, window manager, panel, file manager, etc.
 - ✅ **Proper VNC Setup**: TigerVNC with correct xstartup configuration
-- ✅ **Full Desktop Experience**: Not just a terminal, but complete graphical environment
-- ✅ **Kali Tools Access**: All Kali Linux security tools available from the desktop
+- ✅ **Proper RDP Setup**: xrdp with correct xsession configuration
+- ✅ **Full Desktop Experience**: Complete graphical environment with menus and tools
+- ✅ **Kali Tools Access**: All default Kali Linux security tools pre-installed and in menus
+- ✅ **Kali Theming**: Official Kali themes, icons, and wallpapers included
 
-This is **NOT** a minimal setup - it's the full Kali Linux XFCE desktop environment accessible via VNC.
+This is **NOT** a minimal setup - it's the full Kali Linux XFCE desktop environment as provided by the official Kali ISO, accessible via both VNC and RDP.

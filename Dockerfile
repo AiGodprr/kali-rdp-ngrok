@@ -2,7 +2,7 @@ FROM kalilinux/kali-rolling
 
 RUN apt update && \
     DEBIAN_FRONTEND=noninteractive apt install -y \
-        xfce4 xfce4-goodies xserver-xorg-core \
+        kali-desktop-xfce kali-linux-default \
         tigervnc-standalone-server tigervnc-common \
         xrdp dbus-x11 sudo curl unzip && \
     echo "root:Devil" | chpasswd

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: kali-vnc-ngrok
+    name: ubuntu-gnome-vnc-ngrok
     env: docker
     plan: free
     dockerfilePath: ./Dockerfile

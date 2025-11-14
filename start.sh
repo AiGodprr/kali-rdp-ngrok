@@ -11,26 +11,28 @@ mkdir -p /root/.vnc
 chown -R root:root /root/.config/tigervnc /root/.vnc
 echo "✓ VNC directories prepared"
 
-# Create/update VNC xstartup script for XFCE
+# Create/update VNC xstartup script for GNOME
 cat > /root/.vnc/xstartup << 'EOF'
 #!/bin/sh
 unset SESSION_MANAGER
 unset DBUS_SESSION_BUS_ADDRESS
 export XDG_SESSION_TYPE=x11
-export XDG_CURRENT_DESKTOP=XFCE
-export XDG_SESSION_DESKTOP=XFCE
-exec startxfce4
+export XDG_CURRENT_DESKTOP=GNOME
+export XDG_SESSION_DESKTOP=ubuntu
+export GNOME_SHELL_SESSION_MODE=ubuntu
+exec gnome-session
 EOF
 chmod 755 /root/.vnc/xstartup
-echo "✓ VNC xstartup configured for XFCE"
+echo "✓ VNC xstartup configured for GNOME"
 
 # Create .xsession for RDP (xrdp) sessions
 cat > /root/.xsession << 'EOF'
 #!/bin/sh
 export XDG_SESSION_TYPE=x11
-export XDG_CURRENT_DESKTOP=XFCE
-export XDG_SESSION_DESKTOP=XFCE
-exec startxfce4
+export XDG_CURRENT_DESKTOP=GNOME
+export XDG_SESSION_DESKTOP=ubuntu
+export GNOME_SHELL_SESSION_MODE=ubuntu
+exec gnome-session
 EOF
 chmod 755 /root/.xsession
 echo "✓ xsession configured for RDP"
@@ -78,7 +80,7 @@ sleep 5
 # Display connection information
 echo ""
 echo "============================================"
-echo "  Kali Linux VNC + RDP is ready!"
+echo "  Ubuntu 24.04 GNOME VNC + RDP is ready!"
 echo "============================================"
 echo ""
 echo "System Login Credentials:"

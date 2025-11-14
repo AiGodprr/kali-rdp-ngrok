@@ -5,11 +5,12 @@ This Docker container provides a Kali Linux environment with both VNC and RDP ac
 ## Features
 
 - Kali Linux Rolling base
-- XFCE4 desktop environment
+- **Full Kali XFCE desktop environment** with complete theming and tools
 - TigerVNC server for VNC remote desktop access
 - xrdp server for RDP remote desktop access
 - Dual ngrok TCP tunnels for external access (both VNC and RDP)
 - Single shared XFCE desktop session accessible via both protocols
+- Complete Kali Linux toolset (`kali-linux-default`) with all standard security tools
 
 ## Credentials
 
@@ -158,6 +159,29 @@ To verify the setup is working correctly:
    ps aux | grep Xvnc  # Should show Xvnc process for display :1
    ps aux | grep xrdp  # Should show xrdp processes
    ```
+
+## Image Size & Variants
+
+This image now includes the **full Kali XFCE desktop** (`kali-desktop-xfce`) and **default toolset** (`kali-linux-default`) to provide a complete Kali Linux desktop experience. This means:
+
+- **Complete Desktop Environment**: Full XFCE desktop with Kali theming, panel, menus, and all graphical components
+- **Standard Kali Tools**: All default Kali Linux security and penetration testing tools are pre-installed
+- **Rich Application Menus**: Full application menu structure with categorized Kali tools
+- **Desktop Experience**: Same as running Kali Linux from the official ISO with XFCE
+
+**Image Size Considerations**:
+- The full desktop installation results in a larger Docker image (~3-4 GB) compared to minimal installations
+- First-time build and pull will take longer due to the comprehensive package installation
+- Startup time is slightly increased but still reasonable (typically under 30 seconds)
+- Container runtime memory usage is higher due to the full desktop components
+
+**Why Full Desktop**:
+- Provides the authentic Kali Linux XFCE experience
+- No missing tools or menu items
+- Proper Kali theming and desktop appearance
+- Ready-to-use environment without additional configuration
+
+If you need a lighter variant in the future, you could create a minimal version using only `xfce4` and `xfce4-goodies` packages, but you would lose the complete Kali desktop experience and many pre-installed tools.
 
 ## Troubleshooting
 

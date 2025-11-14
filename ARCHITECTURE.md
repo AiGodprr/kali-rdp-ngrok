@@ -55,13 +55,14 @@
 ### 1. Kali Linux Base
 - **Image**: `kalilinux/kali-rolling`
 - **Description**: Official Kali Linux rolling release
-- **Includes**: All standard Kali Linux tools and utilities
+- **Includes**: Full Kali Linux default toolset via `kali-linux-default` metapackage
 - **User**: root (password: Devil)
 
 ### 2. XFCE Desktop Environment
-Complete installation includes:
+Complete installation via `kali-desktop-xfce` metapackage includes:
 
-#### Core XFCE (xfce4 package):
+#### Full Kali XFCE Desktop (kali-desktop-xfce):
+- Complete XFCE desktop environment with Kali theming
 - `xfce4-session` - Session and startup manager
 - `xfwm4` - Window manager with compositing
 - `xfce4-panel` - Desktop panel with plugins
@@ -69,17 +70,14 @@ Complete installation includes:
 - `Thunar` - File manager
 - `xfce4-appfinder` - Application finder
 - `xfce4-settings` - Settings manager
-
-#### XFCE Goodies (xfce4-goodies package):
 - `xfce4-terminal` - Terminal emulator
 - `xfce4-screenshooter` - Screenshot utility
 - `xfce4-taskmanager` - Task manager
 - `xfce4-notifyd` - Notification daemon
 - `xfce4-power-manager` - Power management
-- `mousepad` - Text editor
-- `ristretto` - Image viewer
-- `parole` - Media player
-- Many additional plugins and utilities
+- Kali themes, icons, and wallpapers
+- All XFCE goodies and utilities
+- Properly configured application menus with Kali tools
 
 ### 3. TigerVNC Server
 - **Package**: `tigervnc-standalone-server`
@@ -201,18 +199,20 @@ Kali Linux System
 - ❌ A basic window manager like TWM
 - ❌ A headless system with only CLI
 - ❌ A lightweight desktop like LXDE or LXQt
+- ❌ Generic XFCE without Kali integration
 
 ### This IS:
-- ✅ Complete Kali Linux system with all tools
-- ✅ Full XFCE desktop environment
-- ✅ All XFCE core components
+- ✅ Complete Kali Linux system with all default tools via `kali-linux-default`
+- ✅ Full Kali-themed XFCE desktop via `kali-desktop-xfce`
+- ✅ All XFCE core components with Kali customization
 - ✅ All XFCE goodies and utilities
 - ✅ Graphical file manager, terminal, and applications
 - ✅ Desktop panel with system tray
-- ✅ Application menu with all Kali tools
+- ✅ Complete application menu with categorized Kali tools
 - ✅ Settings manager for customization
 - ✅ Power management, notifications, and more
-- ✅ Same experience as installing Kali with XFCE on bare metal
+- ✅ Kali themes, icons, and wallpapers
+- ✅ Same experience as installing Kali with XFCE from official ISO
 
 ## Comparison with Previous RDP Setup
 
@@ -253,12 +253,15 @@ docker exec <container> cat /root/.vnc/*.log | grep -i xfce
 
 ## Conclusion
 
-This implementation provides a **complete, full-featured Kali Linux XFCE desktop environment** accessible via VNC. It includes:
+This implementation provides a **complete, full-featured Kali Linux XFCE desktop environment** accessible via both VNC and RDP. It includes:
 
-- All XFCE desktop components
+- Full Kali XFCE desktop via `kali-desktop-xfce` metapackage
+- Complete Kali Linux toolset via `kali-linux-default` metapackage
+- All XFCE desktop components with Kali theming
 - All XFCE utility applications
-- All Kali Linux security tools
-- Full graphical interface
-- Complete desktop experience
+- All standard Kali Linux security and penetration testing tools
+- Full graphical interface with proper theming
+- Complete desktop experience with application menus
+- Kali wallpapers, icons, and customization
 
-Users connecting via VNC will have the exact same experience as if they were running Kali Linux with XFCE on a physical machine.
+Users connecting via VNC or RDP will have the exact same experience as if they were running Kali Linux with XFCE from the official ISO on a physical machine.

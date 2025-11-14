@@ -1,9 +1,0 @@
-version: "3"
-
-agent:
-  authtoken: 353C8pdujnMKrBE4r9H0i2FVm7r_7xq9b8bsGqDLMzmd1VXny
-
-tunnels:
-  vnc:
-    proto: tcp
-    addr: 127.0.0.1:5901

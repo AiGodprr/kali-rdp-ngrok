@@ -1,16 +1,16 @@
-# Kali Linux VNC + RDP with Ngrok
+# Ubuntu 24.04 GNOME VNC + RDP with Ngrok
 
-This Docker container provides a Kali Linux environment with both VNC and RDP access via ngrok.
+This Docker container provides an Ubuntu 24.04 environment with full GNOME desktop and both VNC and RDP access via ngrok.
 
 ## Features
 
-- Kali Linux Rolling base
-- **Full Kali XFCE desktop environment** with complete theming and tools
+- Ubuntu 24.04 LTS base
+- **Full GNOME desktop environment** with complete Ubuntu desktop experience
 - TigerVNC server for VNC remote desktop access
 - xrdp server for RDP remote desktop access
 - Dual ngrok TCP tunnels for external access (both VNC and RDP)
-- Single shared XFCE desktop session accessible via both protocols
-- Complete Kali Linux toolset (`kali-linux-default`) with all standard security tools
+- Single shared GNOME desktop session accessible via both protocols
+- Complete Ubuntu desktop suite with all standard applications
 
 ## Credentials
 
@@ -38,17 +38,17 @@ The service will run as a background worker and automatically print both VNC and
 
 1. Build the Docker image:
 ```bash
-docker build -t kali-vnc-rdp-ngrok .
+docker build -t ubuntu-gnome-vnc-rdp-ngrok .
 ```
 
 2. Run the container:
 ```bash
-docker run -d -p 5901:5901 -p 3389:3389 kali-vnc-rdp-ngrok
+docker run -d -p 5901:5901 -p 3389:3389 ubuntu-gnome-vnc-rdp-ngrok
 ```
 
 Or with custom ngrok authtoken:
 ```bash
-docker run -d -p 5901:5901 -p 3389:3389 -e NGROK_AUTHTOKEN=your_token_here kali-vnc-rdp-ngrok
+docker run -d -p 5901:5901 -p 3389:3389 -e NGROK_AUTHTOKEN=your_token_here ubuntu-gnome-vnc-rdp-ngrok
 ```
 
 3. Check the logs to get the ngrok URLs:
@@ -62,18 +62,18 @@ The startup script will automatically display both VNC and RDP connection detail
 
 ## Connection Configuration
 
-This container provides two ways to access the same Kali XFCE desktop:
+This container provides two ways to access the same Ubuntu GNOME desktop:
 
 ### VNC Access
 - **TigerVNC** server running on display `:1` (port 5901)
-- XFCE4 desktop environment via `~/.vnc/xstartup`
+- Full GNOME desktop environment via `~/.vnc/xstartup`
 - VNC password authentication (`DevilVNC`)
 - 1920x1080 resolution with 24-bit color depth
 - Ngrok TCP tunnel for secure external access
 
 ### RDP Access
 - **xrdp** server running on port 3389
-- Same XFCE4 desktop environment via `~/.xsession`
+- Same GNOME desktop environment via `~/.xsession`
 - System credentials authentication (root / Devil)
 - Full desktop experience with protocol-native features
 - Separate ngrok TCP tunnel for secure external access
@@ -93,7 +93,7 @@ After deployment:
      - **iOS**: VNC Viewer (RealVNC)
    - Connect to the VNC ngrok host:port from the logs
    - Enter VNC password: `DevilVNC`
-   - The XFCE desktop environment will be displayed
+   - The GNOME desktop environment will be displayed
 
 3. **For RDP connection:**
    - Use any RDP client:
@@ -106,7 +106,7 @@ After deployment:
    - Enter credentials:
      - **Username**: `root`
      - **Password**: `Devil`
-   - The XFCE desktop environment will be displayed
+   - The GNOME desktop environment will be displayed
 
 ## Notes
 
@@ -118,7 +118,7 @@ After deployment:
 - The startup script (`start.sh`) automatically displays connection information for both protocols
 - VNC password is set to `DevilVNC` by default
 - RDP uses system credentials: root / Devil
-- Both VNC and RDP connect to the same XFCE desktop session in the container
+- Both VNC and RDP connect to the same GNOME desktop session in the container
 
 ## Render.com Configuration
 
@@ -144,30 +144,30 @@ To verify the setup is working correctly:
    - Use the VNC ngrok URL from logs (format: `hostname:port`)
    - Connect with any VNC client
    - Enter VNC password: `DevilVNC`
-   - Expected behavior: XFCE desktop should load immediately
+   - Expected behavior: GNOME desktop should load immediately
 
 3. **Test RDP Connection**:
    - Use the RDP ngrok URL from logs (format: `hostname:port`)
    - Connect with any RDP client
    - Enter credentials: root / Devil
-   - Expected behavior: XFCE desktop should load immediately
+   - Expected behavior: GNOME desktop should load immediately
 
 4. **Verify Session Type**: After connecting (via VNC or RDP), open a terminal:
    ```bash
    echo $XDG_SESSION_TYPE  # Should output: x11
-   echo $XDG_CURRENT_DESKTOP  # Should output: XFCE
+   echo $XDG_CURRENT_DESKTOP  # Should output: GNOME
    ps aux | grep Xvnc  # Should show Xvnc process for display :1
    ps aux | grep xrdp  # Should show xrdp processes
    ```
 
 ## Image Size & Variants
 
-This image now includes the **full Kali XFCE desktop** (`kali-desktop-xfce`) and **default toolset** (`kali-linux-default`) to provide a complete Kali Linux desktop experience. This means:
+This image includes the **full Ubuntu GNOME desktop** (`ubuntu-desktop`) to provide a complete Ubuntu desktop experience. This means:
 
-- **Complete Desktop Environment**: Full XFCE desktop with Kali theming, panel, menus, and all graphical components
-- **Standard Kali Tools**: All default Kali Linux security and penetration testing tools are pre-installed
-- **Rich Application Menus**: Full application menu structure with categorized Kali tools
-- **Desktop Experience**: Same as running Kali Linux from the official ISO with XFCE
+- **Complete Desktop Environment**: Full GNOME 46 desktop with Ubuntu theming, top bar, activities, and all graphical components
+- **Standard Ubuntu Applications**: All default Ubuntu applications including Firefox, LibreOffice, and system utilities
+- **Rich Application Grid**: Full application grid with categorized Ubuntu applications
+- **Desktop Experience**: Same as running Ubuntu 24.04 LTS from the official ISO with GNOME
 
 **Image Size Considerations**:
 - The full desktop installation results in a larger Docker image (~3-4 GB) compared to minimal installations
@@ -175,13 +175,13 @@ This image now includes the **full Kali XFCE desktop** (`kali-desktop-xfce`) and
 - Startup time is slightly increased but still reasonable (typically under 30 seconds)
 - Container runtime memory usage is higher due to the full desktop components
 
-**Why Full Desktop**:
-- Provides the authentic Kali Linux XFCE experience
-- No missing tools or menu items
-- Proper Kali theming and desktop appearance
+**Why Full GNOME Desktop**:
+- Provides the authentic Ubuntu 24.04 GNOME experience
+- No missing applications or features
+- Proper Ubuntu theming and desktop appearance
 - Ready-to-use environment without additional configuration
 
-If you need a lighter variant in the future, you could create a minimal version using only `xfce4` and `xfce4-goodies` packages, but you would lose the complete Kali desktop experience and many pre-installed tools.
+This setup provides the complete, pure GNOME experience on Ubuntu 24.04 LTS as requested - no XFCE, no minimal setups, just the full GNOME desktop environment.
 
 ## Troubleshooting
 

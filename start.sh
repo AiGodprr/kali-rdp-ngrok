@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Install ngrok if not present
+if ! command -v ngrok &> /dev/null; then
+    echo "Installing ngrok..."
+    curl -fsSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -o /tmp/ngrok.tgz && \
+    tar -xzf /tmp/ngrok.tgz -C /usr/local/bin && \
+    chmod +x /usr/local/bin/ngrok && \
+    rm /tmp/ngrok.tgz
+    echo "✓ ngrok installed"
+fi
+
 # Start dbus
 service dbus start
 echo "✓ D-Bus service started"
@@ -11,29 +21,35 @@ mkdir -p /root/.vnc
 chown -R root:root /root/.config/tigervnc /root/.vnc
 echo "✓ VNC directories prepared"
 
-# Create/update VNC xstartup script for XFCE
+# Create/update VNC xstartup script for GNOME with software rendering
 cat > /root/.vnc/xstartup << 'EOF'
 #!/bin/sh
 unset SESSION_MANAGER
 unset DBUS_SESSION_BUS_ADDRESS
 export XDG_SESSION_TYPE=x11
-export XDG_CURRENT_DESKTOP=XFCE
-export XDG_SESSION_DESKTOP=XFCE
-exec startxfce4
+export XDG_CURRENT_DESKTOP=GNOME
+export XDG_SESSION_DESKTOP=ubuntu
+export GNOME_SHELL_SESSION_MODE=ubuntu
+export LIBGL_ALWAYS_SOFTWARE=1
+export GALLIUM_DRIVER=llvmpipe
+dbus-launch --exit-with-session gnome-session
 EOF
 chmod 755 /root/.vnc/xstartup
-echo "✓ VNC xstartup configured for XFCE"
+echo "✓ VNC xstartup configured for GNOME with software rendering"
 
-# Create .xsession for RDP (xrdp) sessions
+# Create .xsession for RDP (xrdp) sessions with software rendering
 cat > /root/.xsession << 'EOF'
 #!/bin/sh
 export XDG_SESSION_TYPE=x11
-export XDG_CURRENT_DESKTOP=XFCE
-export XDG_SESSION_DESKTOP=XFCE
-exec startxfce4
+export XDG_CURRENT_DESKTOP=GNOME
+export XDG_SESSION_DESKTOP=ubuntu
+export GNOME_SHELL_SESSION_MODE=ubuntu
+export LIBGL_ALWAYS_SOFTWARE=1
+export GALLIUM_DRIVER=llvmpipe
+dbus-launch --exit-with-session gnome-session
 EOF
 chmod 755 /root/.xsession
-echo "✓ xsession configured for RDP"
+echo "✓ xsession configured for RDP with software rendering"
 
 # Kill any existing VNC server
 vncserver -kill :1 2>/dev/null || true
@@ -78,7 +94,7 @@ sleep 5
 # Display connection information
 echo ""
 echo "============================================"
-echo "  Kali Linux VNC + RDP is ready!"
+echo "  Ubuntu 24.04 GNOME VNC + RDP is ready!"
 echo "============================================"
 echo ""
 echo "System Login Credentials:"

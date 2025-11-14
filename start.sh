@@ -4,9 +4,9 @@
 service dbus start
 echo "✓ D-Bus service started"
 
-# Start xrdp
+# Start xrdp with Xvnc backend
 service xrdp start
-echo "✓ XRDP service started"
+echo "✓ XRDP service started (using Xvnc backend)"
 
 # Start ngrok in the background
 echo "Starting ngrok tunnel..."

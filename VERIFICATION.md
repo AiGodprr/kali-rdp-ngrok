@@ -1,24 +1,23 @@
 # VNC Implementation Verification Guide
 
-This document describes how to verify that the Kali Linux XFCE desktop is running correctly via VNC.
+This document describes how to verify that the Fedora 43 GNOME 49 desktop is running correctly via VNC.
 
 ## What's Implemented
 
 ### 1. Docker Image Configuration
-- **Base Image**: `kalilinux/kali-rolling` - Official Kali Linux rolling release
-- **Desktop Environment**: `kali-desktop-xfce` - Full Kali XFCE desktop with theming
-- **Kali Toolset**: `kali-linux-default` - Complete default toolset
-- **VNC Server**: `tigervnc-standalone-server` - TigerVNC for remote access
+- **Base Image**: `fedora:43` - Official Fedora 43 release
+- **Desktop Environment**: `@workstation-product-environment` - Full Fedora GNOME desktop
+- **VNC Server**: `tigervnc-server` - TigerVNC for remote access
 - **RDP Server**: `xrdp` - RDP server for remote desktop protocol access
-- **System Packages**: `dbus-x11`, `sudo`, `curl`, `unzip`
+- **System Packages**: `dbus-x11`, `sudo`, `curl`, `unzip`, `gnupg2`
 
 ### 2. VNC Configuration
 The Dockerfile creates:
 - VNC password file at `/root/.vnc/passwd` with password: `DevilVNC`
 - VNC xstartup script at `/root/.vnc/xstartup` that:
   - Unsets conflicting environment variables
-  - Sets XFCE-specific environment variables
-  - Launches `startxfce4` to start the full XFCE desktop
+  - Sets GNOME-specific environment variables
+  - Launches `gnome-session` to start the full GNOME 49 desktop
 
 ### 3. Startup Process
 The `start.sh` script:
@@ -35,24 +34,24 @@ The `start.sh` script:
 ### Step 1: Build the Docker Image
 ```bash
 cd /home/runner/work/kali-rdp-ngrok/kali-rdp-ngrok
-docker build -t kali-vnc-ngrok .
+docker build -t fedora-gnome-vnc-ngrok .
 ```
 
 **Expected Output:**
-- Successful download of Kali Linux base image
-- Installation of XFCE packages
+- Successful download of Fedora 43 base image
+- Installation of GNOME packages
 - Installation of TigerVNC server
 - VNC password file created
 - VNC xstartup script created
 
 ### Step 2: Run the Container
 ```bash
-docker run -d -p 5901:5901 --name kali-vnc-test kali-vnc-ngrok
+docker run -d -p 5901:5901 --name fedora-vnc-test fedora-gnome-vnc-ngrok
 ```
 
 ### Step 3: Check Container Logs
 ```bash
-docker logs -f kali-vnc-test
+docker logs -f fedora-vnc-test
 ```
 
 **Expected Output:**
@@ -63,7 +62,7 @@ Starting VNC server...
 Starting ngrok tunnel...
 
 ============================================
-  Kali Linux VNC is ready!
+  Fedora 43 GNOME VNC + RDP is ready!
 ============================================
 
 System Login Credentials:
@@ -110,27 +109,26 @@ drwx------ 1 root root 4096 <date> ..
 -rw-r--r-- 1 root root    5 <date> <hostname>:1.pid
 ```
 
-### Step 6: Verify XFCE Process
+### Step 6: Verify GNOME Process
 ```bash
-docker exec kali-vnc-test ps aux | grep xfce
+docker exec fedora-vnc-test ps aux | grep gnome
 ```
 
-**Expected Output:** Multiple XFCE processes including:
-- `xfce4-session`
-- `xfwm4` (window manager)
-- `xfce4-panel`
-- `Thunar` (file manager)
-- `xfdesktop`
+**Expected Output:** Multiple GNOME processes including:
+- `gnome-session`
+- `gnome-shell`
+- `mutter` (window manager)
+- `Nautilus` (file manager)
 
 ### Step 7: Check VNC Log
 ```bash
-docker exec kali-vnc-test cat /root/.vnc/*.log | tail -50
+docker exec fedora-vnc-test cat /root/.vnc/*.log | tail -50
 ```
 
 **Expected Output:**
 - VNC server started successfully
 - X server initialized
-- XFCE session started
+- GNOME session started
 - No critical errors
 
 ### Step 8: Test VNC Connection
@@ -151,34 +149,34 @@ vncviewer localhost:5901
 2. Open your VNC client
 3. Connect to: `<ngrok-host>:<port>`
 4. Enter VNC password: `DevilVNC`
-5. You should see the XFCE desktop with:
-   - Desktop icons
-   - Task bar at the bottom
-   - Application menu
+5. You should see the GNOME 49 desktop with:
+   - Top bar with activities button
+   - Activities overview
+   - Application grid
    - File manager icon
    - Terminal icon
-   - Full Kali Linux desktop environment
+   - Full Fedora desktop environment
 
-### Step 9: Verify XFCE Desktop Features
+### Step 9: Verify GNOME Desktop Features
 
 Once connected via VNC:
 
 1. **Desktop Environment Check:**
-   - Verify XFCE panel is visible at the bottom
+   - Verify GNOME top bar is visible at the top
    - Verify desktop background is loaded
-   - Verify application menu is accessible
+   - Verify activities overview is accessible
 
 2. **Open Terminal:**
-   - Click on terminal icon or use application menu
+   - Click on terminal icon or use application grid
    - Run: `echo $XDG_CURRENT_DESKTOP`
-   - Expected: `XFCE`
+   - Expected: `GNOME`
    - Run: `echo $XDG_SESSION_TYPE`
    - Expected: `x11`
 
 3. **Test Applications:**
-   - Open File Manager (Thunar)
-   - Open Application Finder
-   - Browse available Kali tools
+   - Open File Manager (Nautilus)
+   - Open Activities overview
+   - Browse available Fedora applications
 
 4. **Test Window Management:**
    - Move windows
@@ -196,15 +194,15 @@ Look for error messages about missing dependencies or configuration issues.
 
 ### Issue: Black screen in VNC client
 **Possible causes:**
-- XFCE failed to start
-- Check if `startxfce4` is installed
+- GNOME failed to start
+- Check if `gnome-session` is installed
 - Verify xstartup script permissions
 
 **Check:**
 ```bash
-docker exec kali-vnc-test cat /root/.vnc/xstartup
-docker exec kali-vnc-test ls -l /root/.vnc/xstartup
-docker exec kali-vnc-test which startxfce4
+docker exec fedora-vnc-test cat /root/.vnc/xstartup
+docker exec fedora-vnc-test ls -l /root/.vnc/xstartup
+docker exec fedora-vnc-test which gnome-session
 ```
 
 ### Issue: Can't connect via VNC
@@ -221,13 +219,12 @@ docker exec kali-vnc-test which startxfce4
 - Display `:1` = Port 5901 (what we're using)
 - Display `:2` = Port 5902
 
-### XFCE Components Installed
-- `xfce4-session`: Session manager
-- `xfwm4`: Window manager
-- `xfce4-panel`: Desktop panel
-- `Thunar`: File manager
-- `xfdesktop`: Desktop manager
-- Plus many other utilities from `xfce4-goodies`
+### GNOME Components Installed
+- `gnome-session`: Session manager
+- `gnome-shell`: GNOME Shell interface
+- `mutter`: Window manager
+- `Nautilus`: File manager
+- Plus many other utilities from GNOME suite
 
 ### VNC Server Parameters
 - `-geometry 1920x1080`: Sets screen resolution
@@ -244,22 +241,21 @@ docker exec kali-vnc-test which startxfce4
 - [ ] Connection details are printed
 - [ ] VNC client can connect using ngrok URL
 - [ ] VNC password authentication works
-- [ ] XFCE desktop is visible and functional
+- [ ] GNOME desktop is visible and functional
 - [ ] Can open applications
 - [ ] Can interact with desktop (mouse, keyboard)
 - [ ] No critical errors in logs
 
-## Confirmation of Full Kali XFCE Linux
+## Confirmation of Full Fedora GNOME Desktop
 
 The implementation includes:
-- ✅ **Full Kali Linux**: Using official `kalilinux/kali-rolling` base image
-- ✅ **Complete XFCE Desktop**: Via `kali-desktop-xfce` metapackage with Kali theming
-- ✅ **Default Kali Toolset**: Via `kali-linux-default` metapackage with all standard tools
-- ✅ **All XFCE Components**: Session manager, window manager, panel, file manager, etc.
+- ✅ **Full Fedora 43**: Using official `fedora:43` base image
+- ✅ **Complete GNOME 49 Desktop**: Via `@workstation-product-environment` with Fedora theming
+- ✅ **All GNOME Components**: Session manager, shell, window manager, file manager, etc.
 - ✅ **Proper VNC Setup**: TigerVNC with correct xstartup configuration
 - ✅ **Proper RDP Setup**: xrdp with correct xsession configuration
-- ✅ **Full Desktop Experience**: Complete graphical environment with menus and tools
-- ✅ **Kali Tools Access**: All default Kali Linux security tools pre-installed and in menus
-- ✅ **Kali Theming**: Official Kali themes, icons, and wallpapers included
+- ✅ **Full Desktop Experience**: Complete graphical environment with application grid
+- ✅ **Fedora Applications**: All default Fedora Workstation applications pre-installed
+- ✅ **Fedora Theming**: Official Fedora themes, icons, and wallpapers included
 
-This is **NOT** a minimal setup - it's the full Kali Linux XFCE desktop environment as provided by the official Kali ISO, accessible via both VNC and RDP.
+This is **NOT** a minimal setup - it's the full Fedora 43 GNOME 49 desktop environment as provided by the official Fedora Workstation ISO, accessible via both VNC and RDP.

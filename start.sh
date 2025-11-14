@@ -28,8 +28,8 @@ unset SESSION_MANAGER
 unset DBUS_SESSION_BUS_ADDRESS
 export XDG_SESSION_TYPE=x11
 export XDG_CURRENT_DESKTOP=GNOME
-export XDG_SESSION_DESKTOP=ubuntu
-export GNOME_SHELL_SESSION_MODE=ubuntu
+export XDG_SESSION_DESKTOP=gnome
+export GNOME_SHELL_SESSION_MODE=classic
 export LIBGL_ALWAYS_SOFTWARE=1
 export GALLIUM_DRIVER=llvmpipe
 dbus-launch --exit-with-session gnome-session
@@ -42,8 +42,8 @@ cat > /root/.xsession << 'EOF'
 #!/bin/sh
 export XDG_SESSION_TYPE=x11
 export XDG_CURRENT_DESKTOP=GNOME
-export XDG_SESSION_DESKTOP=ubuntu
-export GNOME_SHELL_SESSION_MODE=ubuntu
+export XDG_SESSION_DESKTOP=gnome
+export GNOME_SHELL_SESSION_MODE=classic
 export LIBGL_ALWAYS_SOFTWARE=1
 export GALLIUM_DRIVER=llvmpipe
 dbus-launch --exit-with-session gnome-session
@@ -94,7 +94,7 @@ sleep 5
 # Display connection information
 echo ""
 echo "============================================"
-echo "  Ubuntu 24.04 GNOME VNC + RDP is ready!"
+echo "  Fedora 43 GNOME VNC + RDP is ready!"
 echo "============================================"
 echo ""
 echo "System Login Credentials:"

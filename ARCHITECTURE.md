@@ -1,4 +1,4 @@
-# Kali Linux VNC Architecture
+# Fedora GNOME VNC Architecture
 
 ## System Architecture
 
@@ -6,18 +6,17 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Docker Container                            │
 │  ┌──────────────────────────────────────────────────────────┐  │
-│  │                 Kali Linux (kali-rolling)                │  │
+│  │                     Fedora 43                            │  │
 │  │                                                          │  │
 │  │  ┌─────────────────────────────────────────────────┐    │  │
-│  │  │        XFCE Desktop Environment                 │    │  │
-│  │  │  - xfce4-session (Session Manager)              │    │  │
-│  │  │  - xfwm4 (Window Manager)                       │    │  │
-│  │  │  - xfce4-panel (Desktop Panel)                  │    │  │
-│  │  │  - Thunar (File Manager)                        │    │  │
-│  │  │  - xfdesktop (Desktop Manager)                  │    │  │
-│  │  │  - xfce4-terminal (Terminal)                    │    │  │
-│  │  │  - All xfce4-goodies utilities                  │    │  │
-│  │  │  - All Kali Linux security tools                │    │  │
+│  │  │        GNOME 49 Desktop Environment             │    │  │
+│  │  │  - gnome-session (Session Manager)              │    │  │
+│  │  │  - gnome-shell (Shell)                          │    │  │
+│  │  │  - mutter (Window Manager)                      │    │  │
+│  │  │  - Nautilus (File Manager)                      │    │  │
+│  │  │  - GNOME Terminal                               │    │  │
+│  │  │  - All GNOME core applications                  │    │  │
+│  │  │  - All Fedora Workstation applications          │    │  │
 │  │  └─────────────────────────────────────────────────┘    │  │
 │  │                          ↕                               │  │
 │  │  ┌─────────────────────────────────────────────────┐    │  │
@@ -52,32 +51,29 @@
 
 ## Component Details
 
-### 1. Kali Linux Base
-- **Image**: `kalilinux/kali-rolling`
-- **Description**: Official Kali Linux rolling release
-- **Includes**: Full Kali Linux default toolset via `kali-linux-default` metapackage
+### 1. Fedora 43 Base
+- **Image**: `fedora:43`
+- **Description**: Official Fedora 43 release
+- **Includes**: Full Fedora Workstation environment via `@workstation-product-environment`
 - **User**: root (password: Devil)
 
-### 2. XFCE Desktop Environment
-Complete installation via `kali-desktop-xfce` metapackage includes:
+### 2. GNOME 49 Desktop Environment
+Complete installation via `@workstation-product-environment` includes:
 
-#### Full Kali XFCE Desktop (kali-desktop-xfce):
-- Complete XFCE desktop environment with Kali theming
-- `xfce4-session` - Session and startup manager
-- `xfwm4` - Window manager with compositing
-- `xfce4-panel` - Desktop panel with plugins
-- `xfdesktop` - Desktop manager (icons, background)
-- `Thunar` - File manager
-- `xfce4-appfinder` - Application finder
-- `xfce4-settings` - Settings manager
-- `xfce4-terminal` - Terminal emulator
-- `xfce4-screenshooter` - Screenshot utility
-- `xfce4-taskmanager` - Task manager
-- `xfce4-notifyd` - Notification daemon
-- `xfce4-power-manager` - Power management
-- Kali themes, icons, and wallpapers
-- All XFCE goodies and utilities
-- Properly configured application menus with Kali tools
+#### Full Fedora GNOME Desktop:
+- Complete GNOME 49 desktop environment with Fedora theming
+- `gnome-session` - Session and startup manager
+- `gnome-shell` - GNOME Shell interface
+- `mutter` - Window manager with compositing
+- `Nautilus` - File manager
+- `GNOME Terminal` - Terminal emulator
+- `GNOME Settings` - Settings manager
+- `GNOME Software` - Application installer
+- `GNOME Calendar` - Calendar application
+- `GNOME Files` - File browser
+- Fedora themes, icons, and wallpapers
+- All GNOME core applications
+- Properly configured application grid with Fedora applications
 
 ### 3. TigerVNC Server
 - **Package**: `tigervnc-standalone-server`
@@ -123,16 +119,16 @@ Complete installation via `kali-desktop-xfce` metapackage includes:
    ├─ Executes /root/.vnc/xstartup
    │  ├─ Sets environment variables:
    │  │  - XDG_SESSION_TYPE=x11
-   │  │  - XDG_CURRENT_DESKTOP=XFCE
-   │  │  - XDG_SESSION_DESKTOP=XFCE
-   │  └─ Executes: startxfce4
+   │  │  - XDG_CURRENT_DESKTOP=GNOME
+   │  │  - XDG_SESSION_DESKTOP=gnome
+   │  └─ Executes: gnome-session
    ├─ Launches Xtigervnc on display :1
-   ├─ Starts XFCE session
-   │  ├─ xfce4-session starts
-   │  ├─ xfwm4 (window manager) starts
-   │  ├─ xfce4-panel starts
-   │  ├─ xfdesktop starts
-   │  └─ All XFCE services start
+   ├─ Starts GNOME session
+   │  ├─ gnome-session starts
+   │  ├─ gnome-shell starts
+   │  ├─ mutter (window manager) starts
+   │  ├─ Nautilus daemon starts
+   │  └─ All GNOME services start
    └─ Listens on port 5901
    ↓
 5. Ngrok starts
@@ -157,15 +153,12 @@ init (PID 1)
 ├─ start.sh
 │  ├─ dbus-daemon (D-Bus session bus)
 │  ├─ Xtigervnc :1 (VNC X server)
-│  │  └─ xfce4-session (XFCE session manager)
-│  │     ├─ xfwm4 (window manager)
-│  │     ├─ xfce4-panel (desktop panel)
-│  │     │  └─ panel plugins
-│  │     ├─ xfdesktop (desktop manager)
-│  │     ├─ Thunar --daemon (file manager)
-│  │     ├─ xfce4-power-manager
-│  │     ├─ xfce4-notifyd (notifications)
-│  │     └─ other XFCE services
+│  │  └─ gnome-session (GNOME session manager)
+│  │     ├─ gnome-shell (GNOME shell)
+│  │     ├─ mutter (window manager)
+│  │     ├─ Nautilus --daemon (file manager)
+│  │     ├─ gnome-settings-daemon
+│  │     └─ other GNOME services
 │  └─ ngrok (TCP tunnel)
 └─ tail -f /tmp/ngrok.log
 ```
@@ -181,9 +174,9 @@ Docker Container Port 5901
       ↓
 TigerVNC Server (display :1)
       ↓
-XFCE Desktop Session
+GNOME 49 Desktop Session
       ↓
-Kali Linux System
+Fedora 43 System
 ```
 
 ## Authentication Layers
@@ -198,34 +191,33 @@ Kali Linux System
 - ❌ A minimal X server with just xterm
 - ❌ A basic window manager like TWM
 - ❌ A headless system with only CLI
-- ❌ A lightweight desktop like LXDE or LXQt
-- ❌ Generic XFCE without Kali integration
+- ❌ A lightweight desktop like LXDE or LXQt or XFCE
+- ❌ Generic GNOME without Fedora integration
 
 ### This IS:
-- ✅ Complete Kali Linux system with all default tools via `kali-linux-default`
-- ✅ Full Kali-themed XFCE desktop via `kali-desktop-xfce`
-- ✅ All XFCE core components with Kali customization
-- ✅ All XFCE goodies and utilities
+- ✅ Complete Fedora 43 system with full Workstation environment
+- ✅ Full Fedora-themed GNOME 49 desktop via `@workstation-product-environment`
+- ✅ All GNOME core components with Fedora customization
+- ✅ All GNOME applications and utilities
 - ✅ Graphical file manager, terminal, and applications
-- ✅ Desktop panel with system tray
-- ✅ Complete application menu with categorized Kali tools
+- ✅ Complete application grid with system tray
+- ✅ Complete application grid with categorized Fedora applications
 - ✅ Settings manager for customization
 - ✅ Power management, notifications, and more
-- ✅ Kali themes, icons, and wallpapers
-- ✅ Same experience as installing Kali with XFCE from official ISO
+- ✅ Fedora themes, icons, and wallpapers
+- ✅ Same experience as installing Fedora 43 Workstation from official ISO
 
-## Comparison with Previous RDP Setup
+## Comparison with Previous Setup
 
-| Aspect | Previous (XRDP) | Current (VNC) |
-|--------|----------------|---------------|
-| Protocol | RDP → XRDP → Xvnc → XFCE | VNC → TigerVNC → XFCE |
-| Layers | 3 translation layers | Direct VNC access |
-| Port | 3389 (RDP) | 5901 (VNC) |
-| Stability | Known issues, blue screens | More stable, direct |
-| Performance | Protocol overhead | Better, less overhead |
-| Client Support | RDP clients only | All VNC clients |
-| Desktop | XFCE via XRDP session | XFCE via VNC session |
-| Kali Tools | Available | Available (same) |
+| Aspect | Previous (Ubuntu 24.04) | Current (Fedora 43) |
+|--------|-------------------------|---------------------|
+| Base OS | Ubuntu 24.04 LTS | Fedora 43 |
+| Desktop | GNOME 46 | GNOME 49 |
+| Protocol | VNC + RDP | VNC + RDP |
+| Port | 5901 (VNC), 3389 (RDP) | 5901 (VNC), 3389 (RDP) |
+| Package Manager | apt/dpkg | dnf/rpm |
+| Desktop Session | gnome-session | gnome-session |
+| Theming | Ubuntu | Fedora |
 
 ## Verification Commands
 
@@ -235,11 +227,10 @@ After container starts, verify the full desktop is running:
 # Check VNC server process
 docker exec <container> ps aux | grep Xtigervnc
 
-# Check XFCE processes
-docker exec <container> ps aux | grep xfce4-session
-docker exec <container> ps aux | grep xfwm4
-docker exec <container> ps aux | grep xfce4-panel
-docker exec <container> ps aux | grep xfdesktop
+# Check GNOME processes
+docker exec <container> ps aux | grep gnome-session
+docker exec <container> ps aux | grep gnome-shell
+docker exec <container> ps aux | grep mutter
 
 # Check D-Bus
 docker exec <container> ps aux | grep dbus-daemon
@@ -247,21 +238,21 @@ docker exec <container> ps aux | grep dbus-daemon
 # Verify environment variables
 docker exec <container> bash -c 'source /root/.vnc/xstartup && echo $XDG_CURRENT_DESKTOP'
 
-# Check VNC log for XFCE startup
-docker exec <container> cat /root/.vnc/*.log | grep -i xfce
+# Check VNC log for GNOME startup
+docker exec <container> cat /root/.vnc/*.log | grep -i gnome
 ```
 
 ## Conclusion
 
-This implementation provides a **complete, full-featured Kali Linux XFCE desktop environment** accessible via both VNC and RDP. It includes:
+This implementation provides a **complete, full-featured Fedora 43 GNOME 49 desktop environment** accessible via both VNC and RDP. It includes:
 
-- Full Kali XFCE desktop via `kali-desktop-xfce` metapackage
-- Complete Kali Linux toolset via `kali-linux-default` metapackage
-- All XFCE desktop components with Kali theming
-- All XFCE utility applications
-- All standard Kali Linux security and penetration testing tools
+- Full Fedora Workstation environment via `@workstation-product-environment`
+- Complete GNOME 49 desktop with Fedora theming
+- All GNOME desktop components with Fedora customization
+- All GNOME utility applications
+- All standard Fedora Workstation applications
 - Full graphical interface with proper theming
-- Complete desktop experience with application menus
-- Kali wallpapers, icons, and customization
+- Complete desktop experience with application grid
+- Fedora wallpapers, icons, and customization
 
-Users connecting via VNC or RDP will have the exact same experience as if they were running Kali Linux with XFCE from the official ISO on a physical machine.
+Users connecting via VNC or RDP will have the exact same experience as if they were running Fedora 43 Workstation with GNOME 49 from the official ISO on a physical machine.

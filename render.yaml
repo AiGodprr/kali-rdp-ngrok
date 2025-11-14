@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ubuntu-gnome-vnc-ngrok
+    name: fedora-gnome-vnc-ngrok
     env: docker
     plan: free
     dockerfilePath: ./Dockerfile

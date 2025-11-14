@@ -2,20 +2,24 @@ FROM kalilinux/kali-rolling
 
 RUN apt update && \
     DEBIAN_FRONTEND=noninteractive apt install -y \
-        xfce4 xfce4-goodies xrdp xorgxrdp xserver-xorg-core \
+        xfce4 xfce4-goodies xserver-xorg-core \
         tigervnc-standalone-server dbus-x11 sudo curl unzip && \
-    echo "root:Devil" | chpasswd && \
-    adduser xrdp ssl-cert
+    echo "root:Devil" | chpasswd
 
-# Copy XRDP configuration files
-COPY config/xrdp/sesman.ini /etc/xrdp/sesman.ini
-COPY config/xrdp/xrdp.ini /etc/xrdp/xrdp.ini
-COPY config/xrdp/startwm.sh /etc/xrdp/startwm.sh
-COPY config/xrdp/root.xsession /root/.xsession
+# Create VNC directory and set up VNC password
+RUN mkdir -p /root/.vnc && \
+    echo "DevilVNC" | vncpasswd -f > /root/.vnc/passwd && \
+    chmod 600 /root/.vnc/passwd
 
-# Set proper permissions for XRDP configuration files
-RUN chmod 644 /etc/xrdp/sesman.ini /etc/xrdp/xrdp.ini && \
-    chmod 755 /etc/xrdp/startwm.sh /root/.xsession
+# Create VNC xstartup script for XFCE
+RUN echo '#!/bin/sh' > /root/.vnc/xstartup && \
+    echo 'unset SESSION_MANAGER' >> /root/.vnc/xstartup && \
+    echo 'unset DBUS_SESSION_BUS_ADDRESS' >> /root/.vnc/xstartup && \
+    echo 'export XDG_SESSION_TYPE=x11' >> /root/.vnc/xstartup && \
+    echo 'export XDG_CURRENT_DESKTOP=XFCE' >> /root/.vnc/xstartup && \
+    echo 'export XDG_SESSION_DESKTOP=XFCE' >> /root/.vnc/xstartup && \
+    echo 'exec startxfce4' >> /root/.vnc/xstartup && \
+    chmod 755 /root/.vnc/xstartup
 
 # Install ngrok
 RUN curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | gpg --dearmor -o /usr/share/keyrings/ngrok.gpg && \
@@ -27,6 +31,6 @@ COPY ngrok.yml /root/.ngrok2/ngrok.yml
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-EXPOSE 3389
+EXPOSE 5901
 
 CMD ["/usr/local/bin/start.sh"]

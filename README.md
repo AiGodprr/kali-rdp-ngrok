@@ -91,9 +91,38 @@ The `render.yaml` file is pre-configured for easy deployment:
 - Auto-deploys on code changes
 - Exposes port 3389 for RDP
 
+## Testing the Configuration
+
+To verify the XRDP setup is working correctly:
+
+1. **Check Services**: After container starts, verify services are running:
+   ```bash
+   docker exec <container_id> service xrdp status
+   docker exec <container_id> ps aux | grep -E "xrdp|Xvnc"
+   ```
+
+2. **Test RDP Connection**: 
+   - Use the ngrok URL from logs (format: `hostname:port`)
+   - Connect with RDP client using credentials: `root` / `Devil`
+   - Expected behavior: XFCE desktop should load without blue screen
+
+3. **Verify Session Type**: After connecting, check the session is using Xvnc:
+   ```bash
+   # Inside the RDP session, open terminal
+   echo $XDG_SESSION_TYPE  # Should output: x11
+   echo $XDG_CURRENT_DESKTOP  # Should output: XFCE
+   ps aux | grep Xvnc  # Should show Xvnc process for your session
+   ```
+
 ## Troubleshooting
 
 If you don't see the ngrok URL in the logs immediately:
 1. Wait 30-60 seconds for ngrok to establish the tunnel
 2. Check the full logs with `docker logs -f <container_id>` or in Render dashboard
 3. The URL will appear in format: `Host: X.tcp.ngrok.io:XXXXX`
+
+If you experience connection issues:
+1. Verify XRDP is running: `docker exec <container_id> service xrdp status`
+2. Check XRDP logs: `docker exec <container_id> cat /var/log/xrdp.log`
+3. Check sesman logs: `docker exec <container_id> cat /var/log/xrdp-sesman.log`
+4. Ensure the Xvnc backend is properly configured in `/etc/xrdp/sesman.ini`

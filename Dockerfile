@@ -23,10 +23,12 @@ RUN echo '#!/bin/sh' > /root/.vnc/xstartup && \
     echo 'exec gnome-session' >> /root/.vnc/xstartup && \
     chmod 755 /root/.vnc/xstartup
 
-# Install ngrok
+# Install ngrok - Note: This step requires internet access
+# If build fails here, ngrok will be installed at container runtime via start.sh
 RUN curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | gpg --dearmor -o /usr/share/keyrings/ngrok.gpg && \
     echo "deb [signed-by=/usr/share/keyrings/ngrok.gpg] https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list && \
-    apt update && apt install -y ngrok
+    apt update && apt install -y ngrok || \
+    (echo "Warning: ngrok installation failed during build, will install at runtime" && true)
 
 # Copy startup script
 COPY start.sh /usr/local/bin/start.sh

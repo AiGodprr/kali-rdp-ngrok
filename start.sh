@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Install ngrok if not present
+if ! command -v ngrok &> /dev/null; then
+    echo "Installing ngrok..."
+    curl -fsSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -o /tmp/ngrok.tgz && \
+    tar -xzf /tmp/ngrok.tgz -C /usr/local/bin && \
+    chmod +x /usr/local/bin/ngrok && \
+    rm /tmp/ngrok.tgz
+    echo "✓ ngrok installed"
+fi
+
 # Start dbus
 service dbus start
 echo "✓ D-Bus service started"

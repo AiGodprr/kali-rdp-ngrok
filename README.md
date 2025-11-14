@@ -1,16 +1,16 @@
-# Ubuntu 24.04 GNOME VNC + RDP with Ngrok
+# Fedora 43 GNOME 49 VNC + RDP with Ngrok
 
-This Docker container provides an Ubuntu 24.04 environment with full GNOME desktop and both VNC and RDP access via ngrok.
+This Docker container provides a Fedora 43 environment with full GNOME 49 desktop and both VNC and RDP access via ngrok.
 
 ## Features
 
-- Ubuntu 24.04 LTS base
-- **Full GNOME desktop environment** with complete Ubuntu desktop experience
+- Fedora 43 base
+- **Full GNOME 49 desktop environment** with complete Fedora desktop experience
 - TigerVNC server for VNC remote desktop access
 - xrdp server for RDP remote desktop access
 - Dual ngrok TCP tunnels for external access (both VNC and RDP)
 - Single shared GNOME desktop session accessible via both protocols
-- Complete Ubuntu desktop suite with all standard applications
+- Complete Fedora desktop suite with all standard applications
 
 ## Credentials
 
@@ -38,17 +38,17 @@ The service will run as a background worker and automatically print both VNC and
 
 1. Build the Docker image:
 ```bash
-docker build -t ubuntu-gnome-vnc-rdp-ngrok .
+docker build -t fedora-gnome-vnc-rdp-ngrok .
 ```
 
 2. Run the container:
 ```bash
-docker run -d -p 5901:5901 -p 3389:3389 ubuntu-gnome-vnc-rdp-ngrok
+docker run -d -p 5901:5901 -p 3389:3389 fedora-gnome-vnc-rdp-ngrok
 ```
 
 Or with custom ngrok authtoken:
 ```bash
-docker run -d -p 5901:5901 -p 3389:3389 -e NGROK_AUTHTOKEN=your_token_here ubuntu-gnome-vnc-rdp-ngrok
+docker run -d -p 5901:5901 -p 3389:3389 -e NGROK_AUTHTOKEN=your_token_here fedora-gnome-vnc-rdp-ngrok
 ```
 
 3. Check the logs to get the ngrok URLs:
@@ -62,7 +62,7 @@ The startup script will automatically display both VNC and RDP connection detail
 
 ## Connection Configuration
 
-This container provides two ways to access the same Ubuntu GNOME desktop:
+This container provides two ways to access the same Fedora GNOME desktop:
 
 ### VNC Access
 - **TigerVNC** server running on display `:1` (port 5901)
@@ -162,12 +162,12 @@ To verify the setup is working correctly:
 
 ## Image Size & Variants
 
-This image includes the **full Ubuntu GNOME desktop** (`ubuntu-desktop`) to provide a complete Ubuntu desktop experience. This means:
+This image includes the **full Fedora GNOME desktop** (`@workstation-product-environment`) to provide a complete Fedora desktop experience. This means:
 
-- **Complete Desktop Environment**: Full GNOME 46 desktop with Ubuntu theming, top bar, activities, and all graphical components
-- **Standard Ubuntu Applications**: All default Ubuntu applications including Firefox, LibreOffice, and system utilities
-- **Rich Application Grid**: Full application grid with categorized Ubuntu applications
-- **Desktop Experience**: Same as running Ubuntu 24.04 LTS from the official ISO with GNOME
+- **Complete Desktop Environment**: Full GNOME 49 desktop with Fedora theming, top bar, activities, and all graphical components
+- **Standard Fedora Applications**: All default Fedora applications including Firefox, LibreOffice, and system utilities
+- **Rich Application Grid**: Full application grid with categorized Fedora applications
+- **Desktop Experience**: Same as running Fedora 43 Workstation from the official ISO with GNOME 49
 
 **Image Size Considerations**:
 - The full desktop installation results in a larger Docker image (~3-4 GB) compared to minimal installations
@@ -176,12 +176,12 @@ This image includes the **full Ubuntu GNOME desktop** (`ubuntu-desktop`) to prov
 - Container runtime memory usage is higher due to the full desktop components
 
 **Why Full GNOME Desktop**:
-- Provides the authentic Ubuntu 24.04 GNOME experience
+- Provides the authentic Fedora 43 GNOME 49 experience
 - No missing applications or features
-- Proper Ubuntu theming and desktop appearance
+- Proper Fedora theming and desktop appearance
 - Ready-to-use environment without additional configuration
 
-This setup provides the complete, pure GNOME experience on Ubuntu 24.04 LTS as requested - no XFCE, no minimal setups, just the full GNOME desktop environment.
+This setup provides the complete, pure GNOME 49 experience on Fedora 43 as requested - no XFCE, no minimal setups, just the full GNOME desktop environment.
 
 ## Troubleshooting
 

@@ -21,7 +21,7 @@ mkdir -p /root/.vnc
 chown -R root:root /root/.config/tigervnc /root/.vnc
 echo "✓ VNC directories prepared"
 
-# Create/update VNC xstartup script for GNOME
+# Create/update VNC xstartup script for GNOME with software rendering
 cat > /root/.vnc/xstartup << 'EOF'
 #!/bin/sh
 unset SESSION_MANAGER
@@ -30,22 +30,26 @@ export XDG_SESSION_TYPE=x11
 export XDG_CURRENT_DESKTOP=GNOME
 export XDG_SESSION_DESKTOP=ubuntu
 export GNOME_SHELL_SESSION_MODE=ubuntu
-exec gnome-session
+export LIBGL_ALWAYS_SOFTWARE=1
+export GALLIUM_DRIVER=llvmpipe
+dbus-launch --exit-with-session gnome-session
 EOF
 chmod 755 /root/.vnc/xstartup
-echo "✓ VNC xstartup configured for GNOME"
+echo "✓ VNC xstartup configured for GNOME with software rendering"
 
-# Create .xsession for RDP (xrdp) sessions
+# Create .xsession for RDP (xrdp) sessions with software rendering
 cat > /root/.xsession << 'EOF'
 #!/bin/sh
 export XDG_SESSION_TYPE=x11
 export XDG_CURRENT_DESKTOP=GNOME
 export XDG_SESSION_DESKTOP=ubuntu
 export GNOME_SHELL_SESSION_MODE=ubuntu
-exec gnome-session
+export LIBGL_ALWAYS_SOFTWARE=1
+export GALLIUM_DRIVER=llvmpipe
+dbus-launch --exit-with-session gnome-session
 EOF
 chmod 755 /root/.xsession
-echo "✓ xsession configured for RDP"
+echo "✓ xsession configured for RDP with software rendering"
 
 # Kill any existing VNC server
 vncserver -kill :1 2>/dev/null || true

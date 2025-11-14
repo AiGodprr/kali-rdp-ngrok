@@ -4,7 +4,8 @@ RUN apt update && \
     DEBIAN_FRONTEND=noninteractive apt install -y \
         ubuntu-desktop \
         tigervnc-standalone-server tigervnc-common \
-        xrdp dbus-x11 sudo curl unzip gnupg && \
+        xrdp dbus-x11 sudo curl unzip gnupg \
+        mesa-utils libgl1-mesa-dri && \
     echo "root:Devil" | chpasswd
 
 # Create VNC directory and set up VNC password
@@ -12,7 +13,7 @@ RUN mkdir -p /root/.vnc && \
     echo "DevilVNC" | vncpasswd -f > /root/.vnc/passwd && \
     chmod 600 /root/.vnc/passwd
 
-# Create VNC xstartup script for GNOME
+# Create VNC xstartup script for GNOME with software rendering
 RUN echo '#!/bin/sh' > /root/.vnc/xstartup && \
     echo 'unset SESSION_MANAGER' >> /root/.vnc/xstartup && \
     echo 'unset DBUS_SESSION_BUS_ADDRESS' >> /root/.vnc/xstartup && \
@@ -20,7 +21,9 @@ RUN echo '#!/bin/sh' > /root/.vnc/xstartup && \
     echo 'export XDG_CURRENT_DESKTOP=GNOME' >> /root/.vnc/xstartup && \
     echo 'export XDG_SESSION_DESKTOP=ubuntu' >> /root/.vnc/xstartup && \
     echo 'export GNOME_SHELL_SESSION_MODE=ubuntu' >> /root/.vnc/xstartup && \
-    echo 'exec gnome-session' >> /root/.vnc/xstartup && \
+    echo 'export LIBGL_ALWAYS_SOFTWARE=1' >> /root/.vnc/xstartup && \
+    echo 'export GALLIUM_DRIVER=llvmpipe' >> /root/.vnc/xstartup && \
+    echo 'dbus-launch --exit-with-session gnome-session' >> /root/.vnc/xstartup && \
     chmod 755 /root/.vnc/xstartup
 
 # Install ngrok - Note: This step requires internet access

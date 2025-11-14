@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: fedora-gnome-vnc-ngrok
+    name: fedora-gnome-qemu-rdp-ngrok
     env: docker
     plan: free
     dockerfilePath: ./Dockerfile
@@ -8,4 +8,4 @@ services:
     autoDeploy: true
     envVars:
       - key: PORT
-        value: 5901
+        value: 3389

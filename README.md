@@ -1,23 +1,21 @@
-# Fedora 43 GNOME 49 VNC + RDP with Ngrok
+# Fedora 43 GNOME 49 QEMU VM with RDP via Ngrok
 
-This Docker container provides a Fedora 43 environment with full GNOME 49 desktop and both VNC and RDP access via ngrok.
+This Docker container runs a QEMU virtual machine with Fedora 43 and full GNOME 49 desktop environment, accessible via RDP through ngrok.
 
 ## Features
 
-- Fedora 43 base
-- **Full GNOME 49 desktop environment** with complete Fedora desktop experience
-- TigerVNC server for VNC remote desktop access
+- **QEMU Virtual Machine** running Fedora 43
+- **Full GNOME 49 desktop environment** with complete Fedora Workstation experience
 - xrdp server for RDP remote desktop access
-- Dual ngrok TCP tunnels for external access (both VNC and RDP)
-- Single shared GNOME desktop session accessible via both protocols
+- ngrok TCP tunnel for secure external access
 - Complete Fedora desktop suite with all standard applications
+- Hardware virtualization support (KVM when available)
 
 ## Credentials
 
-- **System Login**:
+- **System Login** (RDP):
   - Username: `root`
   - Password: `Devil`
-- **VNC Password**: `DevilVNC`
 
 ## Usage
 
@@ -30,72 +28,59 @@ This Docker container provides a Fedora 43 environment with full GNOME 49 deskto
 5. Render will automatically detect the `render.yaml` file
 6. (Optional) Add environment variable `NGROK_AUTHTOKEN` with your ngrok authtoken if you want to use a custom token
 7. Click "Apply" to deploy
-8. Check the logs to see both ngrok connection URLs (VNC and RDP) printed after deployment
+8. Check the logs to see the ngrok RDP connection URL printed after deployment
 
-The service will run as a background worker and automatically print both VNC and RDP connection details in the logs.
+The service will run as a background worker, start the QEMU VM, and automatically print RDP connection details in the logs.
+
+**Note**: The VM will take 3-5 minutes to fully boot and configure GNOME desktop on first run.
 
 ### Run Locally with Docker
 
 1. Build the Docker image:
 ```bash
-docker build -t fedora-gnome-vnc-rdp-ngrok .
+docker build -t fedora-gnome-qemu-rdp-ngrok .
 ```
 
-2. Run the container:
+2. Run the container with privileged mode (required for QEMU/KVM):
 ```bash
-docker run -d -p 5901:5901 -p 3389:3389 fedora-gnome-vnc-rdp-ngrok
+docker run -d --privileged -p 3389:3389 fedora-gnome-qemu-rdp-ngrok
 ```
 
 Or with custom ngrok authtoken:
 ```bash
-docker run -d -p 5901:5901 -p 3389:3389 -e NGROK_AUTHTOKEN=your_token_here fedora-gnome-vnc-rdp-ngrok
+docker run -d --privileged -p 3389:3389 -e NGROK_AUTHTOKEN=your_token_here fedora-gnome-qemu-rdp-ngrok
 ```
 
-3. Check the logs to get the ngrok URLs:
+3. Check the logs to get the ngrok URL:
 ```bash
 docker logs -f <container_id>
 ```
 
-The startup script will automatically display both VNC and RDP connection details including the ngrok tunnel URLs.
+The startup script will automatically display RDP connection details including the ngrok tunnel URL.
 
-4. Connect via VNC or RDP using the displayed host and port with the credentials above.
+4. Connect via RDP using the displayed host and port with the credentials above.
+
+**Important**: The `--privileged` flag is required to enable KVM acceleration for better VM performance.
 
 ## Connection Configuration
 
-This container provides two ways to access the same Fedora GNOME desktop:
-
-### VNC Access
-- **TigerVNC** server running on display `:1` (port 5901)
-- Full GNOME desktop environment via `~/.vnc/xstartup`
-- VNC password authentication (`DevilVNC`)
-- 1920x1080 resolution with 24-bit color depth
-- Ngrok TCP tunnel for secure external access
+This container runs a QEMU virtual machine with Fedora 43 GNOME desktop:
 
 ### RDP Access
-- **xrdp** server running on port 3389
-- Same GNOME desktop environment via `~/.xsession`
+- **xrdp** server running inside the QEMU VM on port 3389
+- Full GNOME 49 desktop environment
 - System credentials authentication (root / Devil)
-- Full desktop experience with protocol-native features
-- Separate ngrok TCP tunnel for secure external access
+- Full Fedora Workstation desktop experience
+- Ngrok TCP tunnel for secure external access
 
-Both protocols connect to the same container and share the same environment, providing flexibility in how you connect.
+The QEMU VM provides a complete Fedora 43 installation with GNOME 49, offering the most authentic Fedora desktop experience.
 
 ### Connection Details
 
 After deployment:
-1. Check the container logs for both ngrok tunnel URLs (VNC and RDP)
-2. **For VNC connection:**
-   - Use any VNC client:
-     - **Windows**: TigerVNC Viewer, RealVNC, TightVNC
-     - **macOS**: TigerVNC Viewer, RealVNC, or built-in Screen Sharing app
-     - **Linux**: Remmina, TigerVNC Viewer, Vinagre, or Krdc
-     - **Android**: VNC Viewer (RealVNC)
-     - **iOS**: VNC Viewer (RealVNC)
-   - Connect to the VNC ngrok host:port from the logs
-   - Enter VNC password: `DevilVNC`
-   - The GNOME desktop environment will be displayed
-
-3. **For RDP connection:**
+1. Check the container logs for the ngrok RDP tunnel URL
+2. Wait 3-5 minutes for the QEMU VM to fully boot (first boot takes longer)
+3. **RDP Connection:**
    - Use any RDP client:
      - **Windows**: Microsoft Remote Desktop (built-in)
      - **macOS**: Microsoft Remote Desktop (from App Store)
@@ -106,19 +91,20 @@ After deployment:
    - Enter credentials:
      - **Username**: `root`
      - **Password**: `Devil`
-   - The GNOME desktop environment will be displayed
+   - The Fedora 43 GNOME 49 desktop environment will be displayed
 
 ## Notes
 
 - The ngrok authtoken can be customized via the `NGROK_AUTHTOKEN` environment variable
 - If `NGROK_AUTHTOKEN` is not set, a default token is used (pre-configured)
-- Ports 5901 (VNC) and 3389 (RDP) are exposed
-- The container runs as a background worker with all services
-- After deployment, both ngrok tunnel URLs will be printed in the logs
-- The startup script (`start.sh`) automatically displays connection information for both protocols
-- VNC password is set to `DevilVNC` by default
+- Port 3389 (RDP) is exposed from the QEMU VM
+- The container runs as a background worker with QEMU VM
+- After deployment, the ngrok tunnel URL will be printed in the logs
+- The startup script (`start.sh`) automatically displays RDP connection information
 - RDP uses system credentials: root / Devil
-- Both VNC and RDP connect to the same GNOME desktop session in the container
+- The VM runs Fedora 43 with full GNOME 49 Workstation environment
+- First boot takes 3-5 minutes as the VM installs and configures GNOME desktop
+- KVM acceleration is used when available for better performance
 
 ## Render.com Configuration
 
@@ -126,118 +112,105 @@ The `render.yaml` file is pre-configured for easy deployment:
 - Deploys as a web service (runs as background worker)
 - Uses the free plan
 - Auto-deploys on code changes
-- Exposes ports 5901 (VNC) and 3389 (RDP)
+- Exposes port 3389 (RDP)
 - Supports custom ngrok authtoken via environment variable
+- Runs in privileged mode for QEMU/KVM support
 
 ## Testing the Configuration
 
 To verify the setup is working correctly:
 
-1. **Check Services**: After container starts, verify services are running:
+1. **Check QEMU VM**: After container starts, verify QEMU is running:
    ```bash
-   docker exec <container_id> ps aux | grep -E "Xvnc|Xtigervnc|xrdp"
-   docker exec <container_id> ls -la /tmp/.X11-unix/
-   docker exec <container_id> service xrdp status
+   docker exec <container_id> ps aux | grep qemu
+   docker logs <container_id>
    ```
 
-2. **Test VNC Connection**: 
-   - Use the VNC ngrok URL from logs (format: `hostname:port`)
-   - Connect with any VNC client
-   - Enter VNC password: `DevilVNC`
-   - Expected behavior: GNOME desktop should load immediately
-
-3. **Test RDP Connection**:
+2. **Test RDP Connection**:
+   - Wait 3-5 minutes for the VM to fully boot
    - Use the RDP ngrok URL from logs (format: `hostname:port`)
    - Connect with any RDP client
    - Enter credentials: root / Devil
-   - Expected behavior: GNOME desktop should load immediately
+   - Expected behavior: Fedora 43 GNOME 49 desktop should load
 
-4. **Verify Session Type**: After connecting (via VNC or RDP), open a terminal:
+3. **Verify QEMU VM**: After connecting via RDP, open a terminal in the VM:
    ```bash
-   echo $XDG_SESSION_TYPE  # Should output: x11
+   cat /etc/fedora-release  # Should show Fedora version
    echo $XDG_CURRENT_DESKTOP  # Should output: GNOME
-   ps aux | grep Xvnc  # Should show Xvnc process for display :1
-   ps aux | grep xrdp  # Should show xrdp processes
+   gnome-shell --version  # Should show GNOME version
    ```
 
-## Image Size & Variants
+## QEMU VM Configuration
 
-This image includes the **full Fedora GNOME desktop** (`@workstation-product-environment`) to provide a complete Fedora desktop experience. This means:
+This setup uses **QEMU virtualization** to run a complete Fedora 43 installation with GNOME 49 desktop:
 
-- **Complete Desktop Environment**: Full GNOME 49 desktop with Fedora theming, top bar, activities, and all graphical components
-- **Standard Fedora Applications**: All default Fedora applications including Firefox, LibreOffice, and system utilities
-- **Rich Application Grid**: Full application grid with categorized Fedora applications
-- **Desktop Experience**: Same as running Fedora 43 Workstation from the official ISO with GNOME 49
+- **True Virtual Machine**: Complete Fedora 43 OS running in QEMU
+- **Full GNOME 49 Desktop**: Authentic Fedora Workstation experience with GNOME 49.1
+- **Hardware Virtualization**: Uses KVM acceleration when available for optimal performance
+- **Cloud-Init Setup**: Automatic configuration on first boot
+- **RDP Access**: xrdp server configured inside the VM for remote access
 
-**Image Size Considerations**:
-- The full desktop installation results in a larger Docker image (~3-4 GB) compared to minimal installations
-- First-time build and pull will take longer due to the comprehensive package installation
-- Startup time is slightly increased but still reasonable (typically under 30 seconds)
-- Container runtime memory usage is higher due to the full desktop components
+**VM Specifications**:
+- Memory: 4GB RAM (configurable)
+- CPUs: 2 cores (configurable)
+- Disk: 20GB virtual disk
+- Display: VirtIO GPU with software rendering
 
-**Why Full GNOME Desktop**:
-- Provides the authentic Fedora 43 GNOME 49 experience
-- No missing applications or features
-- Proper Fedora theming and desktop appearance
-- Ready-to-use environment without additional configuration
+**Why QEMU VM**:
+- Provides the most authentic Fedora 43 experience
+- Complete OS isolation and full system access
+- Proper hardware emulation
+- Supports all Fedora features and applications
+- Can be customized and configured like a real Fedora installation
 
-This setup provides the complete, pure GNOME 49 experience on Fedora 43 as requested - no XFCE, no minimal setups, just the full GNOME desktop environment.
+**Performance Notes**:
+- First boot takes 3-5 minutes for initial setup and GNOME installation
+- Subsequent boots are faster (typically 1-2 minutes)
+- KVM acceleration significantly improves performance when available
+- Runs efficiently on cloud platforms like Render.com
 
 ## Troubleshooting
 
-If you don't see the ngrok URLs in the logs immediately:
-1. Wait 30-60 seconds for ngrok to establish both tunnels
+If you don't see the ngrok URL in the logs immediately:
+1. Wait 30-60 seconds for ngrok to establish the tunnel
 2. Check the full logs with `docker logs -f <container_id>` or in Render dashboard
-3. The URLs will appear in format: `Host: X.tcp.ngrok.io:XXXXX`
+3. The URL will appear in format: `Host: X.tcp.ngrok.io:XXXXX`
 
-If you experience VNC connection issues:
-1. Verify VNC server is running:
+If the VM takes too long to boot:
+1. First boot takes 3-5 minutes for initial setup
+2. Check QEMU is running:
    ```bash
-   docker exec <container_id> ps aux | grep Xvnc
-   docker exec <container_id> ls -la /root/.vnc/
+   docker exec <container_id> ps aux | grep qemu
    ```
-2. Check VNC logs:
-   ```bash
-   docker exec <container_id> cat /root/.vnc/*.log
-   ```
-3. Ensure the VNC password file exists:
-   ```bash
-   docker exec <container_id> ls -l /root/.vnc/passwd
-   ```
-4. Test local VNC connection (if running Docker locally):
-   ```bash
-   # From host machine
-   vncviewer localhost:5901
-   ```
+3. Monitor the container logs for progress updates
+4. Subsequent boots will be faster (1-2 minutes)
 
 If you experience RDP connection issues:
-1. Verify xrdp service is running:
+1. Verify the QEMU VM is running:
    ```bash
-   docker exec <container_id> service xrdp status
-   docker exec <container_id> ps aux | grep xrdp
+   docker exec <container_id> ps aux | grep qemu-system
    ```
-2. Check xrdp logs:
-   ```bash
-   docker exec <container_id> cat /var/log/xrdp.log
-   docker exec <container_id> cat /var/log/xrdp-sesman.log
-   ```
-3. Test local RDP connection (if running Docker locally):
-   ```bash
-   # From Windows/macOS/Linux with RDP client
-   # Connect to localhost:3389
-   ```
+2. Check if the VM has fully booted (wait at least 5 minutes on first boot)
+3. Try connecting again after a few minutes
+4. If running locally, test connection to localhost:3389
 
-### Common Client Configuration Tips
+If QEMU fails to start:
+1. Ensure the container is running with `--privileged` flag
+2. Check available disk space in the container
+3. Review container logs for QEMU error messages
+4. Verify the cloud image downloaded successfully
 
-**VNC Clients:**
-- **TigerVNC Viewer**: Enter connection as `hostname:port` (e.g., `8.tcp.ngrok.io:12345`)
-- **RealVNC**: Use full address `hostname::port` with double colon (e.g., `8.tcp.ngrok.io::12345`)
-- **macOS Screen Sharing**: Use `vnc://hostname:port` format
-- **Remmina (Linux)**: Select VNC protocol, enter `hostname:port`
-- **Mobile VNC Viewer**: Enter hostname and port separately when prompted
+### Common RDP Client Configuration Tips
 
 **RDP Clients:**
 - **Microsoft Remote Desktop (Windows)**: Enter `hostname:port` directly in Computer field
 - **Microsoft Remote Desktop (macOS/iOS)**: Add PC, enter `hostname:port`
 - **Remmina (Linux)**: Select RDP protocol, enter `hostname:port`
 - **FreeRDP/xfreerdp**: Use command like `xfreerdp /v:hostname:port /u:root /p:Devil`
+
+### Performance Tips
+
+- Ensure KVM is available for hardware acceleration
+- Increase VM memory if experiencing slowness (edit `VM_MEMORY` in start.sh)
+- Allow adequate time for first boot GNOME installation
+- Render.com free tier provides sufficient resources for smooth operation

@@ -20,51 +20,46 @@ echo ""
 # VM Configuration
 VM_NAME="fedora43-gnome"
 VM_DISK="/vm/${VM_NAME}.qcow2"
-VM_MEMORY="4096"
+VM_MEMORY="3072"
 VM_CPUS="2"
-VM_DISK_SIZE="20G"
+VM_DISK_SIZE="25G"
 
 # Check if VM disk exists
 if [ ! -f "$VM_DISK" ]; then
     echo "Creating new VM disk image..."
-    qemu-img create -f qcow2 "$VM_DISK" "$VM_DISK_SIZE"
-    echo "✓ VM disk created: $VM_DISK ($VM_DISK_SIZE)"
+    echo "This may take several minutes on first run..."
     
-    # Download Fedora 43 Workstation ISO (cloud image for faster setup)
-    FEDORA_ISO="/vm/fedora-43-cloud.qcow2"
-    if [ ! -f "$FEDORA_ISO" ]; then
-        echo "Downloading Fedora 43 Cloud Base image..."
-        echo "Note: This will be used as a base for the VM"
-        # Using Fedora 39 as 43 may not be available yet
-        curl -L -o "$FEDORA_ISO" "https://download.fedoraproject.org/pub/fedora/linux/releases/39/Cloud/x86_64/images/Fedora-Cloud-Base-39-1.5.x86_64.qcow2" || \
-        curl -L -o "$FEDORA_ISO" "https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-40-1.14.x86_64.qcow2" || \
-        echo "Warning: Could not download Fedora cloud image. Will create from scratch."
-    fi
+    # Download Fedora Workstation ISO or Cloud image
+    FEDORA_IMAGE="/vm/fedora-workstation.qcow2"
     
-    # If cloud image was downloaded, use it as base
-    if [ -f "$FEDORA_ISO" ]; then
-        echo "Using cloud image as base..."
-        qemu-img convert -O qcow2 "$FEDORA_ISO" "$VM_DISK"
-        qemu-img resize "$VM_DISK" "$VM_DISK_SIZE"
-        echo "✓ VM initialized from cloud image"
-    fi
-else
-    echo "✓ Using existing VM disk: $VM_DISK"
-fi
-
-# Create cloud-init configuration for automatic setup
-mkdir -p /vm/cloud-init
-cat > /vm/cloud-init/meta-data << 'EOF'
+    if [ ! -f "$FEDORA_IMAGE" ]; then
+        echo "Downloading Fedora Cloud/Workstation base image..."
+        echo "Note: Using Fedora 40 as it's the latest stable version"
+        
+        # Try downloading Fedora 40 Cloud image (smaller and faster)
+        if curl -L --max-time 600 -o "$FEDORA_IMAGE" "https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-40-1.14.x86_64.qcow2" 2>&1; then
+            echo "✓ Fedora 40 Cloud Base image downloaded"
+            
+            # Create VM disk from cloud image
+            echo "Creating VM disk from cloud image..."
+            cp "$FEDORA_IMAGE" "$VM_DISK"
+            qemu-img resize "$VM_DISK" "$VM_DISK_SIZE"
+            echo "✓ VM disk created: $VM_DISK ($VM_DISK_SIZE)"
+            
+            # Create cloud-init configuration for automatic setup
+            echo "Creating cloud-init configuration..."
+            mkdir -p /vm/cloud-init
+            
+            cat > /vm/cloud-init/meta-data << 'EOFMETA'
 instance-id: fedora-gnome-vm
 local-hostname: fedora-gnome
-EOF
+EOFMETA
 
-cat > /vm/cloud-init/user-data << 'EOF'
+            cat > /vm/cloud-init/user-data << 'EOFUSER'
 #cloud-config
 users:
   - name: root
     lock_passwd: false
-    passwd: $6$rounds=4096$saltsalt$IjK9h0Xhc7xGQmCNLUBwBc4XZ8aEzKqDVj7gKEqS1UfYQlBDVJnRq1kNlKc0vM2qN9Jl0Z7X8h0kKqN0z1
 chpasswd:
   list: |
     root:Devil
@@ -73,32 +68,50 @@ ssh_pwauth: True
 package_update: true
 package_upgrade: false
 packages:
-  - '@workstation-product-environment'
-  - gnome-desktop3
+  - gnome-shell
+  - gnome-terminal
+  - gnome-session
   - xrdp
-  - tigervnc-server
+  - xorgxrdp
   - dbus-x11
+  - dejavu-sans-fonts
+  - dejavu-sans-mono-fonts
 runcmd:
   - systemctl set-default graphical.target
   - systemctl enable gdm
   - systemctl enable xrdp
+  - systemctl start gdm
   - systemctl start xrdp
   - firewall-cmd --permanent --add-port=3389/tcp || true
   - firewall-cmd --reload || true
+  - sed -i 's/max_bpp=32/max_bpp=24/g' /etc/xrdp/xrdp.ini
+  - echo "export GNOME_SHELL_SESSION_MODE=classic" >> /root/.bashrc
   - echo "root:Devil" | chpasswd
-EOF
+EOFUSER
 
-# Create cloud-init ISO
-if [ ! -f "/vm/cloud-init.iso" ]; then
-    echo "Creating cloud-init configuration..."
-    # Try to create ISO with genisoimage or mkisofs
-    if command -v genisoimage &> /dev/null; then
-        genisoimage -output /vm/cloud-init.iso -volid cidata -joliet -rock /vm/cloud-init/user-data /vm/cloud-init/meta-data
-    elif command -v mkisofs &> /dev/null; then
-        mkisofs -output /vm/cloud-init.iso -volid cidata -joliet -rock /vm/cloud-init/user-data /vm/cloud-init/meta-data
-    else
-        echo "Note: ISO creation tools not available, will boot without cloud-init"
+            # Install required tools for creating cloud-init ISO
+            echo "Installing ISO creation tools..."
+            dnf install -y genisoimage 2>/dev/null || dnf install -y mkisofs 2>/dev/null || true
+            
+            # Create cloud-init ISO
+            if command -v genisoimage &> /dev/null; then
+                genisoimage -output /vm/cloud-init.iso -volid cidata -joliet -rock /vm/cloud-init/ 2>/dev/null
+                echo "✓ cloud-init ISO created"
+            elif command -v mkisofs &> /dev/null; then
+                mkisofs -output /vm/cloud-init.iso -volid cidata -joliet -rock /vm/cloud-init/ 2>/dev/null
+                echo "✓ cloud-init ISO created"
+            else
+                echo "Warning: Could not create cloud-init ISO (ISO tools not available)"
+            fi
+        else
+            echo "Error: Could not download Fedora image"
+            echo "Creating empty disk image..."
+            qemu-img create -f qcow2 "$VM_DISK" "$VM_DISK_SIZE"
+            echo "Note: VM will boot without OS. You'll need to attach an ISO manually."
+        fi
     fi
+else
+    echo "✓ Using existing VM disk: $VM_DISK"
 fi
 
 # Get ngrok authtoken from environment variable or use default

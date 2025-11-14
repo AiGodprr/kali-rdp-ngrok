@@ -7,7 +7,7 @@ RUN dnf install -y --setopt=sslverify=false ca-certificates && \
     dnf install -y --setopt=sslverify=false \
         qemu-kvm qemu-img qemu-system-x86 \
         curl unzip gnupg2 \
-        python3 expect \
+        python3 expect genisoimage \
         && \
     dnf clean all
 

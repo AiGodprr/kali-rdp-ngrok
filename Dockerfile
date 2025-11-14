@@ -1,11 +1,15 @@
 FROM fedora:43
 
-RUN dnf update -y && \
-    dnf install -y \
+# Update and install packages (SSL workaround for build environment)
+RUN dnf install -y --setopt=sslverify=false ca-certificates && \
+    update-ca-trust && \
+    dnf update -y --setopt=sslverify=false && \
+    dnf install -y --setopt=sslverify=false \
         @workstation-product-environment \
         tigervnc-server \
         xrdp dbus-x11 sudo curl unzip gnupg2 \
         mesa-dri-drivers mesa-libGL && \
+    dnf clean all && \
     echo "root:Devil" | chpasswd
 
 # Create VNC directory and set up VNC password

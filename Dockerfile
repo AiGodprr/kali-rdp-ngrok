@@ -3,7 +3,8 @@ FROM kalilinux/kali-rolling
 RUN apt update && \
     DEBIAN_FRONTEND=noninteractive apt install -y \
         xfce4 xfce4-goodies xserver-xorg-core \
-        tigervnc-standalone-server dbus-x11 sudo curl unzip && \
+        tigervnc-standalone-server tigervnc-common \
+        xrdp dbus-x11 sudo curl unzip && \
     echo "root:Devil" | chpasswd
 
 # Create VNC directory and set up VNC password
@@ -26,11 +27,10 @@ RUN curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | gpg --dearmor -o /u
     echo "deb [signed-by=/usr/share/keyrings/ngrok.gpg] https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list && \
     apt update && apt install -y ngrok
 
-# Copy ngrok config and startup script
-COPY ngrok.yml /root/.ngrok2/ngrok.yml
+# Copy startup script
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-EXPOSE 5901
+EXPOSE 5901 3389
 
 CMD ["/usr/local/bin/start.sh"]

@@ -55,7 +55,7 @@ NGROK_TOKEN="${NGROK_AUTHTOKEN:-35SfwXIN64gkw59BROC10ZONXJB_6SqDctBbRwcTpxsW3moK
 echo "Generating ngrok configuration..."
 mkdir -p /root/.ngrok2
 cat > /root/.ngrok2/ngrok.yml << EOF
-version: "2"
+version: "3"
 agent:
   authtoken: ${NGROK_TOKEN}
 tunnels:

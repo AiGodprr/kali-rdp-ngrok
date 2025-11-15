@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: fedora-code-server
+    name: ubuntu-code-server
     env: docker
     plan: free
     dockerfilePath: ./Dockerfile

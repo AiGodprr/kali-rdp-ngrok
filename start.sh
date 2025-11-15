@@ -3,7 +3,7 @@
 set -e
 
 echo "============================================"
-echo "  Fedora Code-Server Setup"
+echo "  Ubuntu Code-Server Setup"
 echo "============================================"
 echo ""
 
@@ -33,7 +33,7 @@ echo ""
 
 # Display connection information
 echo "============================================"
-echo "  Fedora Code-Server is ready!"
+echo "  Ubuntu Code-Server is ready!"
 echo "============================================"
 echo ""
 echo "Access Credentials:"

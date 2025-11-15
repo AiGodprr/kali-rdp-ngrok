@@ -1,17 +1,17 @@
-FROM fedora:43
+FROM ubuntu:24.04
 
 # Update and install required packages
-RUN dnf install -y --setopt=sslverify=false ca-certificates && \
-    update-ca-trust && \
-    dnf update -y --setopt=sslverify=false && \
-    dnf install -y --setopt=sslverify=false \
+RUN apt-get update && \
+    apt-get install -y \
+        ca-certificates \
         curl \
         git \
         nodejs \
         npm \
         tar \
         && \
-    dnf clean all
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install code-server by downloading the binary
 RUN curl -fsSLk https://github.com/coder/code-server/releases/download/v4.23.1/code-server-4.23.1-linux-amd64.tar.gz -o /tmp/code-server.tar.gz && \

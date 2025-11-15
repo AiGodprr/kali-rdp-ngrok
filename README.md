@@ -1,11 +1,11 @@
-# Fedora Code-Server
+# Ubuntu Code-Server
 
-This Docker container runs code-server (VS Code in the browser) on Fedora 43.
+This Docker container runs code-server (VS Code in the browser) on Ubuntu 24.04.
 
 ## Features
 
 - **Code-Server** - VS Code running in your browser
-- **Fedora 43** - Latest stable Fedora base
+- **Ubuntu 24.04** - Latest LTS Ubuntu base
 - **Git and Node.js** - Pre-installed development tools
 - **Lightweight** - No desktop environment, just the essentials
 - **Simple setup** - Direct port exposure, no tunnels needed
@@ -35,19 +35,19 @@ The service will start code-server on port 8080.
 
 1. Build the Docker image:
 ```bash
-docker build -t fedora-code-server .
+docker build -t ubuntu-code-server .
 ```
 
 2. Run the container:
 ```bash
-docker run -d -p 8080:8080 fedora-code-server
+docker run -d -p 8080:8080 ubuntu-code-server
 ```
 
 Or with custom password:
 ```bash
 docker run -d -p 8080:8080 \
   -e CODE_SERVER_PASSWORD=your_password_here \
-  fedora-code-server
+  ubuntu-code-server
 ```
 
 3. Access code-server:
@@ -61,7 +61,7 @@ docker logs -f <container_id>
 
 ## Connection Configuration
 
-This container runs code-server on Fedora 43:
+This container runs code-server on Ubuntu 24.04:
 
 ### Code-Server Access
 - **code-server** - VS Code running in the browser on port 8080
@@ -112,19 +112,19 @@ To verify the setup is working correctly:
    - Enter password: Devil (or your custom password)
    - Expected behavior: VS Code interface should load in the browser
 
-3. **Verify Fedora environment**: In the code-server terminal:
+3. **Verify Ubuntu environment**: In the code-server terminal:
    ```bash
-   cat /etc/fedora-release  # Should show Fedora version
+   cat /etc/os-release      # Should show Ubuntu version
    node --version           # Should show Node.js version
    git --version            # Should show Git version
    ```
 
 ## Code-Server Configuration
 
-This setup runs **code-server** directly on Fedora 43:
+This setup runs **code-server** directly on Ubuntu 24.04:
 
 - **VS Code in Browser**: Full Visual Studio Code experience accessible via web browser
-- **Fedora 43 Base**: Clean, minimal Fedora installation
+- **Ubuntu 24.04 Base**: Clean, minimal Ubuntu LTS installation
 - **Pre-installed Tools**: Git and Node.js ready to use
 - **Extension Support**: Install VS Code extensions as needed
 - **Direct Access**: Simple port exposure, no complex setup
@@ -133,7 +133,7 @@ This setup runs **code-server** directly on Fedora 43:
 - Lightweight - no desktop environment overhead
 - Fast startup - ready in seconds
 - Full VS Code functionality
-- Terminal access to Fedora system
+- Terminal access to Ubuntu system
 - File system access and editing
 
 **Why Code-Server**:

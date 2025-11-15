@@ -1,31 +1,29 @@
 FROM fedora:43
 
-# Update and install QEMU and required packages
+# Update and install required packages
 RUN dnf install -y --setopt=sslverify=false ca-certificates && \
     update-ca-trust && \
     dnf update -y --setopt=sslverify=false && \
     dnf install -y --setopt=sslverify=false \
-        qemu-kvm qemu-img qemu-system-x86 \
-        curl unzip gnupg2 \
-        python3 expect genisoimage \
+        curl \
+        git \
+        nodejs \
+        npm \
+        tar \
         && \
     dnf clean all
 
-# Install ngrok - Note: This step requires internet access
-# If build fails here, ngrok will be installed at container runtime via start.sh
-RUN curl -fsSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -o /tmp/ngrok.tgz && \
-    tar -xzf /tmp/ngrok.tgz -C /usr/local/bin && \
-    chmod +x /usr/local/bin/ngrok && \
-    rm /tmp/ngrok.tgz || \
-    (echo "Warning: ngrok installation failed during build, will install at runtime" && true)
-
-# Create directory for VM files
-RUN mkdir -p /vm
+# Install code-server by downloading the binary
+RUN curl -fsSLk https://github.com/coder/code-server/releases/download/v4.23.1/code-server-4.23.1-linux-amd64.tar.gz -o /tmp/code-server.tar.gz && \
+    tar -xzf /tmp/code-server.tar.gz -C /tmp && \
+    mv /tmp/code-server-4.23.1-linux-amd64 /usr/local/lib/code-server && \
+    ln -s /usr/local/lib/code-server/bin/code-server /usr/local/bin/code-server && \
+    rm /tmp/code-server.tar.gz
 
 # Copy startup script
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-EXPOSE 3389
+EXPOSE 8080
 
 CMD ["/usr/local/bin/start.sh"]
